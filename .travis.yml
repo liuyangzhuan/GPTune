@@ -71,7 +71,7 @@ before_install:
   - printf "${BLUE} GC; Done installing openmpi\n"
   
   - printf "${BLUE} GC; Installing BLASfrom apt\n"
-  - sudo apt-get install libblas-dev
+  - sudo apt-get install libblas-dev 
   - export BLAS_LIB=/usr/lib/x86_64-linux-gnu/libblas.so
   - printf "${BLUE} GC; Done installing BLASfrom apt\n"
 

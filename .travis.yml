@@ -140,4 +140,5 @@ install:
 
 script:
   - cd $TRAVIS_BUILD_DIR
+  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python ./demo.py ;;# test the demo
   - travis_wait 80 sudo sh ./.travis_tests.sh

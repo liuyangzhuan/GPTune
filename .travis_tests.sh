@@ -10,8 +10,8 @@ export PYTHONPATH="$PYTHONPATH:$TRAVIS_BUILD_DIR/mpi4py/"
 export PYTHONPATH="$PYTHONPATH:/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/"
 export MPIRUN="$TRAVIS_BUILD_DIR/installDir/openmpi-4.0.2/bin/mpirun"
 
-export PATH="$PATH:$TRAVIS_BUILD_DIR/installDir/openmpi-4.0.2/bin"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/installDir/openmpi-4.0.2/lib/" 
+#export PATH="$PATH:$TRAVIS_BUILD_DIR/installDir/openmpi-4.0.2/bin"
+#export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/installDir/openmpi-4.0.2/lib/" 
 
 case "${TEST_NUMBER}" in
 1) cd $TRAVIS_BUILD_DIR

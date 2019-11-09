@@ -16,27 +16,54 @@ works, and perform publicly and display publicly, and to permit other to do so.
 # GPTune
 
 *GPTune* is an autotuning framework that relies on multitask and transfer learnings to help solve the underlying black-box optimization problem.
-GPTune is part of the xSDK effort supported by the Exascale Computing Project (ECP).
+GPTune is part of the xSDK4ECP effort supported by the Exascale Computing Project (ECP).
 
-## Install
+## Depdency
+GPTune relies on OpenMPI/4.0 (url), Python 3.7, BLAS/LAPACK/SCALAPACK(url) (compiled with OpenMPI/4.0?), mpi4py (built with openmpi/4.0), scikit-optimize, autotune, intel-depdent lib (??). 
 
-GPTune relies on external Python libraries as listed in the `requirements.txt` file.
-They can all be installed through the standard Python repository through the pip tool.
+All these need be installed before installing GPTune.
 
+## Install mpi4py
 ```
-pip install --upgrade --user -r requirements.txt
+git clone https://github.com/mpi4py/mpi4py.git
+cd mpi4py/
+python setup.py build --mpicc="$CCC -shared"
+python setup.py install --user
 ```
-Besides the basic requirements, a common autotuning interface has to be installed manually as follows:
 
+## Install scikit-optimize
+```
+git clone https://github.com/scikit-optimize/scikit-optimize.git
+cd scikit-optimize/
+env CC=$CCC pip install --user -e .
+```
+
+## Install autotune
+autotune contains a common autotuning interface used by GPTune and ytopt. It can be installed as follows:
 ```
 git clone https://github.com/ytopt-team/autotune.git
 cd autotune/
 pip install -e .
 ```
 
+## Install GPTune
+
+(change makefile to cmake?)
+
+GPTune also depends on several external Python libraries as listed in the `requirements.txt` file. These Python libraries can all be installed through the standard Python repository through the pip tool.
+
+```
+pip install --upgrade --user -r requirements.txt
+```
+Besides the basic requirements, 
+
 The library can be run either sequentially or in parallel.  In the latter case, the MPI library should be installed.
 #XXX MPICC
+
 ## Examples
+
+
+(how to tune compiler parameters, different libs,)
 
 The file `demo.py` in the `examples` folder shows how to describe the autotuning problem and how to invoke GPTune.
 
@@ -101,3 +128,4 @@ Then, the different kinds of tuning techniques (*MLA, ...*) can be called throug
 
 ## REFERENCES
 
+W.M. Sid-Lakhdar, M.M. Aznaveh, X.S. Li, and J. Demmel, "Multitask and Transfer Learning for Autotuning Exascale Applications", arXiv:1908.05792, Aug. 2019.

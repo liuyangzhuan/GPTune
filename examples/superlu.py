@@ -2,7 +2,7 @@
 
 """
 Example of invocation of this script:
-
+ 
 python superlu.py -nodes 1 -cores 32 -ntask 20 -nrun 800 -machine cori -jobid 0
 
 where:

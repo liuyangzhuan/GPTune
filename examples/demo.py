@@ -40,10 +40,11 @@ from autotune.search import *
 
 # Define Problem
 
-# YL: for the spaces, the following datatypes are supported: Note: Categorical's onehot transform has not been tested
-# Real(lower, upper, "uniform", "normalize", name="yourname")
-# Integer(lower, upper, "normalize", name="yourname")
-# Categorical(categories, transform="onehot", name="yourname")  
+# YL: for the spaces, the following datatypes are supported: 
+# Real(lower, upper, transform="normalize", name="yourname")
+# Integer(lower, upper, transform="normalize", name="yourname")
+# Categoricalnorm(categories, transform="onehot", name="yourname")  	
+	
 
 # Argmin{x} objective(t,x), for x in [0., 1.]
 
@@ -102,7 +103,7 @@ problem = TuningProblem(input_space, parameter_space, output_space, objective, c
 if __name__ == '__main__':	
 	computer = Computer(nodes = 1, cores = 1, hosts = None)
 	options = Options()
-	options['model_processes'] = 1
+	options['model_processes'] = 2
 	options['model_threads'] = 1
 	options['model_restarts'] = 1
 	options['search_multitask_processes'] = 1

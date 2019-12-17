@@ -2,8 +2,7 @@
 
 """
 Example of invocation of this script:
- 
-python superlu.py -nodes 1 -cores 32 -ntask 20 -nrun 800 -machine cori -jobid 0
+python superlu.py -nodes 1 -cores 32 -ntask 20 -nrun 800 -machine cori
 
 where:
     -nodes is the number of compute nodes
@@ -11,7 +10,6 @@ where:
     -ntask is the number of different matrix sizes that will be tuned
     -nrun is the number of calls per task 
     -machine is the name of the machine
-    -jobid is optional. You can always set it to 0.
 """
 
 ################################################################################
@@ -96,11 +94,11 @@ def objective(point):                  # should always use this name for user-de
 	comm.Disconnect()	
 
 
-	retval = tmpdata[0]
-	print(params, ' superlu time: ', retval)
+	# retval = tmpdata[0]
+	# print(params, ' superlu time: ', retval)
  
-	# retval = tmpdata[1]
-	# print(params, ' superlu memory: ', retval)
+	retval = tmpdata[1]
+	print(params, ' superlu memory: ', retval)
 
 
 
@@ -158,19 +156,19 @@ def main_interactive():
     optimization = args.optimization
     nruns = args.nruns
     truns = args.truns
-    JOBID = args.jobid
+    # JOBID = args.jobid
     
     
     os.environ['MACHINE_NAME']=machine
     os.environ['TUNER_NAME']='GPTune'
     TUNER_NAME = os.environ['TUNER_NAME']
     # print(os.environ)
-    os.system("mkdir -p /global/homes/l/liuyangz/Cori/my_research/github/superlu_dist_master_gptune_11_22_2019/exp; mkdir -p /global/homes/l/liuyangz/Cori/my_research/github/superlu_dist_master_gptune_11_22_2019/exp/%s;"%(TUNER_NAME))
+    # os.system("mkdir -p /global/homes/l/liuyangz/Cori/my_research/github/superlu_dist_master_gptune_11_22_2019/exp; mkdir -p /global/homes/l/liuyangz/Cori/my_research/github/superlu_dist_master_gptune_11_22_2019/exp/%s;"%(TUNER_NAME))
 
-# YL: for the spaces, the following datatypes are supported: Note: Categorical's onehot transform has not been tested
-# Real(lower, upper, "uniform", "normalize", name="yourname")
-# Integer(lower, upper, "normalize", name="yourname")
-# Categorical(categories, transform="onehot", name="yourname")  	
+# YL: for the spaces, the following datatypes are supported: 
+# Real(lower, upper, transform="normalize", name="yourname")
+# Integer(lower, upper, transform="normalize", name="yourname")
+# Categoricalnorm(categories, transform="onehot", name="yourname")  	
 	
 	
     matrices = ["big.rua", "g4.rua", "g20.rua"]
@@ -180,7 +178,7 @@ def main_interactive():
     matrix    = Categoricalnorm (matrices, transform="onehot", name="matrix")
 
     # Input parameters
-    COLPERM   = Categoricalnorm ([2, 4], transform="onehot", name="COLPERM")
+    COLPERM   = Categoricalnorm (['2', '4'], transform="onehot", name="COLPERM")
     LOOKAHEAD = Integer     (5, 20, transform="normalize", name="LOOKAHEAD")
     nprows    = Integer     (1, nodes*cores, transform="normalize", name="nprows")
     nproc     = Integer     (nodes, nodes*cores, transform="normalize", name="nproc")
@@ -217,10 +215,11 @@ def main_interactive():
     options['shared_memory_parallelism'] = False
     options['mpi_comm'] = None
     options['model_class '] = 'Model_LCM'
+    options['verbose'] = False
     data = Data(problem)
     gt = GPTune(problem, computer = computer, data = data, options = options)
 
-
+ 
 
     NI = ntask
     NS = nruns
@@ -233,8 +232,20 @@ def main_interactive():
         print("    Xs ", data.X[tid])
         print("    Ys ", data.Y[tid])
         print('    Xopt ', data.X[tid][np.argmin(data.Y[tid])], 'Yopt ', min(data.Y[tid])[0])
+    
+    
+    
+    
+    newtask = ["big.rua","g4.rua"]
+    (aprxopts,objval) = gt.TLA1(newtask, nruns)
+    
+    for tid in range(len(newtask)):
+        print("new task: %s"%(newtask[tid]))
+        print('    predicted Xopt: ', aprxopts[tid], ' objval: ',objval[tid]) 	
 		
-		
+
+  
+  
 def parse_args():
 
     # Parse command line arguments

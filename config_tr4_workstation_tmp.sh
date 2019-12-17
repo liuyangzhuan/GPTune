@@ -1,31 +1,18 @@
-#!/bin/bash
 
-module load gcc/9.1.0
-module load openmpi/4.0.1
-module load scalapack-netlib/2.0.2
-module load python/3.7.4
+# export MKLROOT=/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl
+# export LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64
 
-shopt -s expand_aliases
-alias python='python3.7'
-alias pip='pip3.7'
-
-
-export PATH=$PATH:/home/administrator/.local/bin/
 export PYTHONPATH=$PYTHONPATH:$PWD/autotune/
 export PYTHONPATH=$PYTHONPATH:$PWD/scikit-optimize/
 export PYTHONPATH=$PYTHONPATH:$PWD/mpi4py/
 export PYTHONWARNINGS=ignore
 
-CCC=$MPICC
-CCCPP=$MPICXX
-FTN=$MPIF90
-RUN=$MPIRUN
+CCC=/home/administrator/Desktop/software/openmpi-4.0.2/bin/mpicc
+CCCPP=/home/administrator/Desktop/software/openmpi-4.0.2/bin/mpicxx
+FTN=/home/administrator/Desktop/software/openmpi-4.0.2/bin/mpif90
+RUN=/home/administrator/Desktop/software/openmpi-4.0.2/bin/mpirun
 
-python --version
-pip --version
-
-pip install --upgrade --user -r requirements.txt
-#env CC=$CCC pip install --upgrade --user -r requirements.txt
+env CC=$CCC pip install --upgrade --user -r requirements.txt
 
 mkdir -p build
 cd build
@@ -35,8 +22,8 @@ rm -rf CTestTestfile.cmake
 rm -rf cmake_install.cmake
 rm -rf CMakeFiles
 cmake .. \
-	-DCMAKE_CXX_FLAGS="" \
-	-DCMAKE_C_FLAGS="" \
+	-DCMAKE_CXX_FLAGS="-I/usr/local/include/python3.8" \
+	-DCMAKE_C_FLAGS="-I/usr/local/include/python3.8" \
 	-DBUILD_SHARED_LIBS=ON \
 	-DCMAKE_CXX_COMPILER=$CCCPP \
 	-DCMAKE_C_COMPILER=$CCC \
@@ -45,7 +32,7 @@ cmake .. \
 	-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
 	-DTPL_BLAS_LIBRARIES="/usr/lib/x86_64-linux-gnu/libblas.so" \
 	-DTPL_LAPACK_LIBRARIES="/usr/lib/x86_64-linux-gnu/liblapack.so" \
-	-DTPL_SCALAPACK_LIBRARIES="/home/administrator/Desktop/Software/scalapack-2.0.2/build/lib/libscalapack.so"
+	-DTPL_SCALAPACK_LIBRARIES="/usr/lib/x86_64-linux-gnu/libscalapack.so"
 make
 cp lib_gptuneclcm.so ../.
 cp pdqrdriver ../
@@ -92,8 +79,8 @@ cd ../../../
 rm -rf mpi4py
 git clone https://github.com/mpi4py/mpi4py.git
 cd mpi4py/
-python setup.py build --mpicc="$CCC -shared"
-python setup.py install
+python3.8 setup.py build --mpicc="$CCC -shared"
+python3.8 setup.py install
 # env CC=mpicc pip install --user -e .
 
 
@@ -102,22 +89,22 @@ cd ../
 rm -rf scikit-optimize
 git clone https://github.com/scikit-optimize/scikit-optimize.git
 cd scikit-optimize/
-pip install --user -e .
+env CC=$CCC pip install --user -e .
  
  
 cd ../
 rm -rf autotune
 git clone https://github.com/ytopt-team/autotune.git
 cd autotune/
-pip install --user -e .
+env CC=$CCC pip install --user -e .
  
 
 cd ../examples
-$RUN --allow-run-as-root --use-hwthread-cpus -n 1 python ./demo.py
+$RUN --allow-run-as-root --use-hwthread-cpus -n 1 python3.8 ./demo.py
 
 cd ../examples
-$RUN --allow-run-as-root --use-hwthread-cpus -n 1 python ./scalapack.py -mmax 1000 -nmax 1000 -nodes 1 -cores 4 -ntask 1 -nrun 4 -machine tr4 -jobid 0
+$RUN --allow-run-as-root --use-hwthread-cpus -n 1 python3.8 ./scalapack.py -mmax 1000 -nmax 1000 -nodes 1 -cores 4 -ntask 1 -nrun 4 -machine tr4 -jobid 0
 
 
 cd ../examples
-$RUN --allow-run-as-root --use-hwthread-cpus -n 1 python ./superlu.py  -nodes 1 -cores 4 -ntask 1 -nrun 20 -machine tr4 
+$RUN --allow-run-as-root --use-hwthread-cpus -n 1 python3.8 ./superlu.py  -nodes 1 -cores 4 -ntask 1 -nrun 20 -machine tr4 

@@ -1,6 +1,4 @@
-language: python
-python:
-  - 3.7
+language: generic
 compiler: gcc
 os: linux
 dist: bionic
@@ -31,25 +29,37 @@ git:
 before_install:
   - export BLUE="\033[34;1m"
   - mkdir -p installDir
-
-  - printf  "${BLUE} GC; Installing gcc-7 via apt\n"
+  - printf  "${BLUE} GC; Installing gcc-9 via apt\n"
   - sudo apt-get update
   - sudo apt-get install build-essential software-properties-common -y
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
-  - sudo apt-get install gcc-7 g++-7 -y
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-  - export CXX="g++-7"
-  - export CC="gcc-7"
-  - printf "${BLUE} GC; Done installing gcc-7 via apt\n"
+  - sudo apt-get install gcc-9 g++-9 -y
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+  - export CXX="g++-9"
+  - export CC="gcc-9"
+  - printf "${BLUE} GC; Done installing gcc-9 via apt\n"
 
   - printf "${BLUE} GC; Installing gfortran via apt\n"
-  - sudo apt-get install gfortran-7 -y
-  - sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-7 60
-  - export FC="gfortran-7"
+  - sudo apt-get install gfortran-9 -y
+  - sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-9 60
+  - export FC="gfortran-9"
   - printf "${BLUE} GC; Done installing gfortran via apt\n"
 
-  
+    
+  - printf "${BLUE} GC; Installing python3.7.1 with gcc-9\n"
+  - wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
+  - tar -xvf Python-3.7.1.tgz
+  - cd Python-3.7.1
+  - ./configure --prefix=$PWD CC=$CC
+  - make -j8
+  - make install
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/installDir/Python-3.7.1/lib  
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/installDir/Python-3.7.1/bin
+  - export PYTHONHOME=$PYTHONHOME:$TRAVIS_BUILD_DIR/installDir/Python-3.7.1/
+  - printf "${BLUE} GC; Done Installing python3.7.1 with gcc-9\n"
+
+
   - printf "${BLUE} GC; Installing bzip2 apt\n"
   - sudo apt-get install bzip2
   - printf "${BLUE} GC; Done installing bzip2 apt\n"
@@ -57,14 +67,14 @@ before_install:
   
   - printf "${BLUE} GC; Installing openmpi\n"
   - cd $TRAVIS_BUILD_DIR/installDir
-  - wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.bz2
-  - bzip2 -d openmpi-4.0.2.tar.bz2
-  - tar -xvf openmpi-4.0.2.tar
-  - cd openmpi-4.0.2/
+  - wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.bz2
+  - bzip2 -d openmpi-4.0.1.tar.bz2
+  - tar -xvf openmpi-4.0.1.tar
+  - cd openmpi-4.0.1/
   - ./configure --prefix=$PWD --enable-mpi-interface-warning --enable-shared --enable-static --enable-cxx-exceptions CC=$CC CXX=$CXX F77=$FC FC=$FC --enable-mpi1-compatibility 
-  - make 
+  - make -j8 
   - make install  
-  - sudo cp -r $TRAVIS_BUILD_DIR/installDir/openmpi-4.0.2/lib/* /usr/lib/x86_64-linux-gnu/.
+  - sudo cp -r $TRAVIS_BUILD_DIR/installDir/openmpi-4.0.1/lib/* /usr/lib/x86_64-linux-gnu/.
   - export MPICC="$PWD/bin/mpicc"
   - export MPICXX="$PWD/bin/mpicxx"
   - export MPIF90="$PWD/bin/mpif90"
@@ -109,10 +119,10 @@ install:
   - export BLUE="\033[34;1m"
   - printf "${BLUE} GC; Installing GPtune from source\n"
   - cd $TRAVIS_BUILD_DIR
-  - export PYTHONPATH="$PYTHONPATH:/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/"
   - export PYTHONPATH="$PYTHONPATH:$TRAVIS_BUILD_DIR/autotune/"
   - export PYTHONPATH="$PYTHONPATH:$TRAVIS_BUILD_DIR/scikit-optimize/"
   - export PYTHONPATH="$PYTHONPATH:$TRAVIS_BUILD_DIR/mpi4py/"
+  - export PYTHONWARNINGS=ignore
 
 
   - env CC=$MPICC pip install -r requirements.txt
@@ -124,7 +134,8 @@ install:
   - rm -rf CTestTestfile.cmake
   - rm -rf cmake_install.cmake
   - rm -rf CMakeFiles
-  - cmake .. \
+  - |
+    cmake .. \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_CXX_COMPILER=$MPICXX \
     -DCMAKE_C_COMPILER=$MPICC \
@@ -133,7 +144,7 @@ install:
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
     -DTPL_BLAS_LIBRARIES="$BLAS_LIB" \
     -DTPL_LAPACK_LIBRARIES="$LAPACK_LIB" \
-    -DTPL_SCALAPACK_LIBRARIES="$SCALAPACK_LIB"
+    -DTPL_SCALAPACK_LIBRARIES=$SCALAPACK_LIB
   - make
   - cp lib_gptuneclcm.so ../.
   - cp pdqrdriver ../
@@ -156,7 +167,8 @@ install:
   - PARMETIS_LIBRARIES=$PWD/parmetis-4.0.3/install/lib/libparmetis.so
   - mkdir -p build
   - cd build
-  - cmake .. \
+  - |
+    cmake .. \
     -DCMAKE_CXX_FLAGS="-Ofast -std=c++11 -DAdd_ -DRELEASE" \
     -DCMAKE_C_FLAGS="-std=c11 -DPRNTlevel=0 -DPROFlevel=0 -DDEBUGlevel=0" \
     -DBUILD_SHARED_LIBS=OFF \
@@ -197,6 +209,6 @@ install:
 
 script:
   - cd $TRAVIS_BUILD_DIR/examples
-  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python ./demo.py
-  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python ./scalapack.py -mmax 500 -nmax 500 -nodes 1 -cores 4 -ntask 1 -nrun 4 -machine travis -jobid 0
-  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python ./superlu.py -nodes 1 -cores 4 -ntask 1 -nrun 4 -machine travis -jobid 0
+  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python3.7 ./demo.py
+  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python3.7 ./scalapack.py -mmax 1000 -nmax 1000 -nodes 1 -cores 4 -ntask 10 -nrun 10 -machine travis -jobid 0
+  - $MPIRUN --allow-run-as-root --oversubscribe -n 1 python3.7 ./superlu.py -nodes 1 -cores 4 -ntask 1 -nrun 4 -machine travis 

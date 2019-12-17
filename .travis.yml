@@ -46,18 +46,40 @@ before_install:
   - export FC="gfortran-9"
   - printf "${BLUE} GC; Done installing gfortran via apt\n"
 
-    
-  - printf "${BLUE} GC; Installing python3.7.1 with gcc-9\n"
-  - wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
-  - tar -xvf Python-3.7.1.tgz
-  - cd Python-3.7.1
+  - printf "${BLUE} GC; Installing python2.7.16 with gcc-9\n"
+  - cd $TRAVIS_BUILD_DIR/installDir
+  - wget https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
+  - tar -xvf Python-2.7.16.tgz
+  - cd $TRAVIS_BUILD_DIR/installDir/Python-2.7.16
   - ./configure --prefix=$PWD CC=$CC
   - make -j8
   - make install
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/installDir/Python-3.7.1/lib  
-  - export PATH=$PATH:$TRAVIS_BUILD_DIR/installDir/Python-3.7.1/bin
-  - export PYTHONHOME=$PYTHONHOME:$TRAVIS_BUILD_DIR/installDir/Python-3.7.1/
-  - printf "${BLUE} GC; Done Installing python3.7.1 with gcc-9\n"
+  - sudo rm /opt/pyenv/shims/python*
+  - sudo cp ./bin/python2.7 /opt/pyenv/shims/python2.7.16
+  - sudo cp ./bin/python2.7 /opt/pyenv/shims/python2.7
+  - sudo cp ./bin/python2.7 /opt/pyenv/shims/python
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/installDir/Python-2.7.16/lib  
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/installDir/Python-2.7.16/bin
+  - export PYTHONHOME=$TRAVIS_BUILD_DIR/installDir/Python-2.7.16/
+  - printf "${BLUE} GC; Done Installing python2.7.16 with gcc-9\n"  
+  
+  
+  
+  - printf "${BLUE} GC; Installing python3.7.4 with gcc-9\n"
+  - cd $TRAVIS_BUILD_DIR/installDir
+  - wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
+  - tar -xvf Python-3.7.4.tgz
+  - cd $TRAVIS_BUILD_DIR/installDir/Python-3.7.4
+  - ./configure --prefix=$PWD CC=$CC
+  - make -j8
+  - make altinstall
+  - sudo cp ./bin/python3.7 /opt/pyenv/shims/python
+  - sudo cp ./bin/python3.7 /opt/pyenv/shims/python3
+  - sudo cp ./bin/python3.7 /opt/pyenv/shims/python3.7
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/installDir/Python-3.7.4/lib  
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/installDir/Python-3.7.4/bin
+  - export PYTHONHOME=$TRAVIS_BUILD_DIR/installDir/Python-3.7.4/
+  - printf "${BLUE} GC; Done Installing python3.7.4 with gcc-9\n"
 
 
   - printf "${BLUE} GC; Installing bzip2 apt\n"
@@ -125,7 +147,7 @@ install:
   - export PYTHONWARNINGS=ignore
 
 
-  - env CC=$MPICC pip install -r requirements.txt
+  - env CC=$MPICC pip3.7 install -r requirements.txt
 
   - mkdir -p build
   - cd build
@@ -189,21 +211,20 @@ install:
   - rm -rf mpi4py
   - git clone https://github.com/mpi4py/mpi4py.git
   - cd mpi4py/
-  - python setup.py build --mpicc="$MPICC -shared"
-  - python setup.py install
-  - env CC=$MPICC pip install -e .
+  - python3.7 setup.py build --mpicc="$MPICC -shared"
+  - python3.7 setup.py install
 
   - cd ../
   - rm -rf scikit-optimize
   - git clone https://github.com/scikit-optimize/scikit-optimize.git
   - cd scikit-optimize/
-  - env CC=$MPICC pip install -e .
+  - env CC=$MPICC pip3.7 install -e .
 
   - cd ../
   - rm -rf autotune
   - git clone https://github.com/ytopt-team/autotune.git
   - cd autotune/
-  - env CC=$MPICC pip install -e .
+  - env CC=$MPICC pip3.7 install -e .
   - printf "${BLUE} GC; Done installing GPtune from source\n"
 
 

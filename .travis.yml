@@ -51,7 +51,8 @@ before_install:
   - mkdir build
   - cd build
   - ../configure -v --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --prefix=$PWD/../ --enable-checking=no --enable-languages=c,c++,fortran --disable-multilib
-  - make -j8 --quiet
+    #  - make -j8 --quiet
+  - make -j8 
   - make install-strip
   - sudo update-alternatives --install /usr/bin/gcc gcc $TRAVIS_BUILD_DIR/installDir/gcc-9.1.0/bin/gcc 60 --slave /usr/bin/g++ g++ $TRAVIS_BUILD_DIR/installDir/gcc-9.1.0/bin/g++
   - sudo update-alternatives --install /usr/bin/gfortran gfortran $TRAVIS_BUILD_DIR/installDir/gcc-9.1.0/bin/gfortran 60

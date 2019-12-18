@@ -43,6 +43,7 @@ before_install:
   - mkdir -p installDir
   - cd $TRAVIS_BUILD_DIR/installDir
   - wget https://ftpmirror.gnu.org/gcc/gcc-9.1.0/gcc-9.1.0.tar.gz
+  - tar -xvf gcc-9.1.0.tar.gz
   - cd gcc-9.1.0/
   - mkdir build
   - cd build

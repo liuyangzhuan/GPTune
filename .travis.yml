@@ -51,7 +51,10 @@ before_install:
   - mkdir build
   - cd build
   - ../configure -v --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --prefix=$PWD/../ --enable-checking=no --enable-languages=c,c++,fortran --disable-multilib
-  - travis_wait 160 make -j8 --quiet
+  - cp $TRAVIS_BUILD_DIR/travis_build_gcc.sh .
+  - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
+  - bash travis_build_gcc.sh 
+  # - make -j8 &>build_gcc.log
     # - make -j8 
   - make install-strip
   - sudo update-alternatives --install /usr/bin/gcc gcc $TRAVIS_BUILD_DIR/installDir/gcc-9.1.0/bin/gcc 60 --slave /usr/bin/g++ g++ $TRAVIS_BUILD_DIR/installDir/gcc-9.1.0/bin/g++

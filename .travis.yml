@@ -74,7 +74,7 @@ before_install:
   - ./configure --prefix=$PWD CC=$CC  
   - cp $TRAVIS_BUILD_DIR/travis_build_python2.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
-  - sh travis_build_python2.sh
+  - bash travis_build_python2.sh
     #- make -j8 --quiet 
     #- make install
   - sudo rm /opt/pyenv/shims/python*
@@ -96,7 +96,7 @@ before_install:
   - ./configure --prefix=$PWD CC=$CC
   - cp $TRAVIS_BUILD_DIR/travis_build_python3.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
-  - sh travis_build_python3.sh
+  - bash travis_build_python3.sh
     #- make -j8
     #- make altinstall
   - sudo cp ./bin/python3.7 /opt/pyenv/shims/python
@@ -122,7 +122,7 @@ before_install:
   - ./configure --prefix=$PWD --enable-mpi-interface-warning --enable-shared --enable-static --enable-cxx-exceptions CC=$CC CXX=$CXX F77=$FC FC=$FC --enable-mpi1-compatibility 
   - cp $TRAVIS_BUILD_DIR/travis_build_openmpi.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
-  - sh travis_build_openmpi.sh  
+  - bash travis_build_openmpi.sh  
     #- make -j8 
     #- make install  
   - sudo cp -r $TRAVIS_BUILD_DIR/installDir/openmpi-4.0.1/lib/* /usr/lib/x86_64-linux-gnu/.

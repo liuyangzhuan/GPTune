@@ -75,7 +75,7 @@ before_install:
   - cp $TRAVIS_BUILD_DIR/travis_build_python2.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
   - bash travis_build_python2.sh
-    #- make -j8  
+    #- make -j8   
     #- make install
   - sudo rm /opt/pyenv/shims/python*
   - sudo cp ./bin/python2.7 /opt/pyenv/shims/python2.7.16

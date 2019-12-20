@@ -50,7 +50,6 @@ before_install:
   - cd gcc-9.1.0/
   - mkdir build
   - cd build
-  - ../configure -v --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --prefix=$PWD/../ --enable-checking=no --enable-languages=c,c++,fortran --disable-multilib &>build_gcc.log
   - cp $TRAVIS_BUILD_DIR/travis_build_gcc.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
   - bash travis_build_gcc.sh 
@@ -70,8 +69,7 @@ before_install:
   - cd $TRAVIS_BUILD_DIR/installDir
   - wget https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
   - tar -xvf Python-2.7.16.tgz
-  - cd $TRAVIS_BUILD_DIR/installDir/Python-2.7.16
-  - ./configure --prefix=$PWD CC=$CC  
+  - cd $TRAVIS_BUILD_DIR/installDir/Python-2.7.16 
   - cp $TRAVIS_BUILD_DIR/travis_build_python2.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
   - bash travis_build_python2.sh
@@ -93,7 +91,6 @@ before_install:
   - wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
   - tar -xvf Python-3.7.4.tgz
   - cd $TRAVIS_BUILD_DIR/installDir/Python-3.7.4
-  - ./configure --prefix=$PWD CC=$CC
   - cp $TRAVIS_BUILD_DIR/travis_build_python3.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
   - bash travis_build_python3.sh
@@ -118,8 +115,7 @@ before_install:
   - wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.bz2
   - bzip2 -d openmpi-4.0.1.tar.bz2
   - tar -xvf openmpi-4.0.1.tar
-  - cd openmpi-4.0.1/
-  - ./configure --prefix=$PWD --enable-mpi-interface-warning --enable-shared --enable-static --enable-cxx-exceptions CC=$CC CXX=$CXX F77=$FC FC=$FC --enable-mpi1-compatibility 
+  - cd openmpi-4.0.1/ 
   - cp $TRAVIS_BUILD_DIR/travis_build_openmpi.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
   - bash travis_build_openmpi.sh  
@@ -161,7 +157,7 @@ before_install:
     -DCMAKE_Fortran_FLAGS="-fopenmp" \
     -DBLAS_LIBRARIES="$BLAS_LIB" \
     -DLAPACK_LIBRARIES="$LAPACK_LIB"
-  - make
+  - make -j8  &>build_scalapack.log
   - sudo cp $TRAVIS_BUILD_DIR/installDir/scalapack-2.0.2/build/lib/libscalapack.so /usr/lib/x86_64-linux-gnu/.
   - export SCALAPACK_LIB="/usr/lib/x86_64-linux-gnu/libscalapack.so"  
   - printf "${BLUE} GC; Done installing ScaLAPACK from source\n"
@@ -176,7 +172,7 @@ install:
   - export PYTHONWARNINGS=ignore
 
 
-  - env CC=$MPICC pip3.7 install -r requirements.txt
+  - env CC=$MPICC pip3.7 install -r requirements.txt &>build_gptune.log
 
   - mkdir -p build
   - cd build
@@ -196,7 +192,7 @@ install:
     -DTPL_BLAS_LIBRARIES="$BLAS_LIB" \
     -DTPL_LAPACK_LIBRARIES="$LAPACK_LIB" \
     -DTPL_SCALAPACK_LIBRARIES=$SCALAPACK_LIB
-  - make
+  - make &>>build_gptune.log
   - cp lib_gptuneclcm.so ../.
   - cp pdqrdriver ../
 
@@ -232,7 +228,7 @@ install:
     -DTPL_LAPACK_LIBRARIES="$LAPACK_LIB" \
     -DTPL_PARMETIS_INCLUDE_DIRS=$PARMETIS_INCLUDE_DIRS \
     -DTPL_PARMETIS_LIBRARIES=$PARMETIS_LIBRARIES
-  - make pddrive_spawn
+  - make pddrive_spawn &>>build_gptune.log
 
 
 
@@ -240,8 +236,8 @@ install:
   - rm -rf mpi4py
   - git clone https://github.com/mpi4py/mpi4py.git
   - cd mpi4py/
-  - python3.7 setup.py build --mpicc="$MPICC -shared"
-  - python3.7 setup.py install
+  - python3.7 setup.py build --mpicc="$MPICC -shared" &>>build_gptune.log
+  - python3.7 setup.py install &>>build_gptune.log
 
   - cd ../
   - rm -rf scikit-optimize

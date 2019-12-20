@@ -205,27 +205,36 @@ def main_interactive():
     computer = Computer(nodes = nodes, cores = cores, hosts = None)  
 
     options = Options()
-    options['model_processes'] = 1
-    options['model_threads'] = 1
+    # options['model_processes'] = 1
+    # options['model_threads'] = 1
     options['model_restarts'] = 1
-    options['search_multitask_processes'] = 1
-    options['model_restart_processes'] = 1
-    options['model_restart_threads'] = 1
-    options['distributed_memory_parallelism'] = True
+    # options['search_multitask_processes'] = 1
+    # options['model_restart_processes'] = 1
+    # options['model_restart_threads'] = 1
+    options['distributed_memory_parallelism'] = False
     options['shared_memory_parallelism'] = False
-    options['mpi_comm'] = None
+    # options['mpi_comm'] = None
     options['model_class '] = 'Model_LCM'
     options['verbose'] = False
+	
+    options.validate(computer = computer)
     data = Data(problem)
     gt = GPTune(problem, computer = computer, data = data, options = options)
 
 
-
-    NI = ntask
+    # """ Building MLA with NI random tasks """
+    # NI = ntask
+    # NS = nruns
+    # (data, model,stats) = gt.MLA(NS=NS, NI=NI, NS1 = max(NS//2,1))
+    # print("stats: ",stats)
+	
+    """ Building MLA with the given list of tasks """	
+    giventask = [[460,500],[800,690]]	
+    NI = len(giventask)
     NS = nruns
-
-    (data, model) = gt.MLA(NS=NS, NI=NI, NS1 = max(NS//2,1))
-
+    (data, model,stats) = gt.MLA(NS=NS, NI=NI, Tgiven =giventask, NS1 = max(NS//2,1))
+    print("stats: ",stats)
+	
     for tid in range(NI):
         print("tid: %d"%(tid))
         print("    m:%d n:%d"%(data.T[tid][0], data.T[tid][1]))
@@ -235,8 +244,9 @@ def main_interactive():
 
     newtask = [[400,500],
                [800,600]]
-    (aprxopts,objval) = gt.TLA1(newtask, nruns)
-    
+    (aprxopts,objval,stats) = gt.TLA1(newtask, nruns)
+    print("stats: ",stats)
+		
     for tid in range(len(newtask)):
         print("new task: %s"%(newtask[tid]))
         print('    predicted Xopt: ', aprxopts[tid], ' objval: ',objval[tid]) 	

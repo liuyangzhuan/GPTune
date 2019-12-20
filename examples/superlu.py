@@ -93,12 +93,13 @@ def objective(point):                  # should always use this name for user-de
 	# print(tmpdata,'got it')
 	comm.Disconnect()	
 
-
-	# retval = tmpdata[0]
-	# print(params, ' superlu time: ', retval)
+	if(target=='time'):	
+		retval = tmpdata[0]
+		print(params, ' superlu time: ', retval)
  
-	retval = tmpdata[1]
-	print(params, ' superlu memory: ', retval)
+	if(target=='memory'):	
+		retval = tmpdata[1]
+		print(params, ' superlu memory: ', retval)
 
 
 
@@ -123,6 +124,7 @@ def main_interactive():
     global ROOTDIR
     global nodes
     global cores
+    global target
 
     # Parse command line arguments
 
@@ -162,8 +164,7 @@ def main_interactive():
     os.environ['MACHINE_NAME']=machine
     os.environ['TUNER_NAME']='GPTune'
     TUNER_NAME = os.environ['TUNER_NAME']
-    # print(os.environ)
-    # os.system("mkdir -p /global/homes/l/liuyangz/Cori/my_research/github/superlu_dist_master_gptune_11_22_2019/exp; mkdir -p /global/homes/l/liuyangz/Cori/my_research/github/superlu_dist_master_gptune_11_22_2019/exp/%s;"%(TUNER_NAME))
+ 
 
 # YL: for the spaces, the following datatypes are supported: 
 # Real(lower, upper, transform="normalize", name="yourname")
@@ -202,29 +203,44 @@ def main_interactive():
 
     print(IS, PS, OS, constraints, models)
 
+	
+	
+    # target='memory'
+    target='time'
+	
+	
     problem = TuningProblem(IS, PS, OS, objective, constraints, None)
     computer = Computer(nodes = nodes, cores = cores, hosts = None)  
 
     options = Options()
-    options['model_processes'] = 1
-    options['model_threads'] = 1
+    # options['model_processes'] = 1
+    # options['model_threads'] = 1
     options['model_restarts'] = 1
-    options['search_multitask_processes'] = 1
-    options['model_restart_processes'] = 1
+    # options['search_multitask_processes'] = 1
+    # options['model_restart_processes'] = 1
     options['distributed_memory_parallelism'] = True
     options['shared_memory_parallelism'] = False
-    options['mpi_comm'] = None
     options['model_class '] = 'Model_LCM'
     options['verbose'] = False
+	
+    options.validate(computer = computer)
     data = Data(problem)
     gt = GPTune(problem, computer = computer, data = data, options = options)
 
  
 
-    NI = ntask
+    # """ Building MLA with NI random tasks """
+    # NI = ntask
+    # NS = nruns
+    # (data, model,stats) = gt.MLA(NS=NS, NI=NI, NS1 = max(NS//2,1))
+    # print("stats: ",stats)
+	
+    """ Building MLA with the given list of tasks """	
+    giventask = [["big.rua"], ["g4.rua"], ["g20.rua"]]	
+    NI = len(giventask)
     NS = nruns
-
-    (data, model) = gt.MLA(NS=NS, NI=NI, NS1 = max(NS//2,1))
+    (data, model,stats) = gt.MLA(NS=NS, NI=NI, Tgiven =giventask, NS1 = max(NS//2,1))
+    print("stats: ",stats)
 
     for tid in range(NI):
         print("tid: %d"%(tid))
@@ -236,9 +252,10 @@ def main_interactive():
     
     
     
-    newtask = ["big.rua","g4.rua"]
-    (aprxopts,objval) = gt.TLA1(newtask, nruns)
-    
+    newtask = [["big.rua"],["g4.rua"]]
+    (aprxopts,objval,stats) = gt.TLA1(newtask, nruns)
+    print("stats: ",stats)
+	
     for tid in range(len(newtask)):
         print("new task: %s"%(newtask[tid]))
         print('    predicted Xopt: ', aprxopts[tid], ' objval: ',objval[tid]) 	

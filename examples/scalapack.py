@@ -206,9 +206,9 @@ def main_interactive():
     NS = nruns
     (data, model,stats) = gt.MLA(NS=NS, NI=NI, Tgiven =giventask, NS1 = max(NS//2,1))
     print("stats: ",stats)
-	
+    
     pickle.dump(gt, open('MLA.pkl', 'wb'))
-	
+
     for tid in range(NI):
         print("tid: %d"%(tid))
         print("    m:%d n:%d"%(data.T[tid][0], data.T[tid][1]))
@@ -255,7 +255,6 @@ def parse_args():
     # Extract arguments
 
     return (args.mmax, args.nmax, args.ntask, args.nodes, args.cores, args.machine, args.optimization, args.nruns, args.truns, args.jobid, args.stepid, args.phase)
-              pickle.dump(z[key].Y, open(EXPDIR + "/Y_%d_%s_%d.pkl"%(STEPID, key[0], key[1]), 'wb'))
 
 if __name__ == "__main__":
 

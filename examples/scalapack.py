@@ -207,7 +207,11 @@ def main_interactive():
     (data, model,stats) = gt.MLA(NS=NS, NI=NI, Tgiven =giventask, NS1 = max(NS//2,1))
     print("stats: ",stats)
     
-    pickle.dump(gt, open('MLA.pkl', 'wb'))
+    pickle.dump(gt, open('MLA_nodes_%d_cores_%d_mmax_%d_nmax_%d_machine_%s_jobid_%d.pkl'%(nodes,cores,mmax,nmax,machine,JOBID), 'wb'))
+	
+	
+	
+	
 
     for tid in range(NI):
         print("tid: %d"%(tid))

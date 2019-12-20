@@ -10,7 +10,7 @@ while true; do
             exit 1
         else
             #echo "monitoring $logfile"
-            echo $line
+            echo "${line: -1}" 
         fi
 done
 

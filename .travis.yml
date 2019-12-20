@@ -68,7 +68,7 @@ before_install:
   - printf "${BLUE} GC; Installing python2.7.16 with gcc-9\n"
   - cd $TRAVIS_BUILD_DIR/installDir
   - wget https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz
-  - tar -xvf Python-2.7.16.tgz
+  - tar -xvf Python-2.7.16.tgz &>build_python2.log
   - cd $TRAVIS_BUILD_DIR/installDir/Python-2.7.16 
   - cp $TRAVIS_BUILD_DIR/travis_build_python2.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
@@ -89,7 +89,7 @@ before_install:
   - printf "${BLUE} GC; Installing python3.7.4 with gcc-9\n"
   - cd $TRAVIS_BUILD_DIR/installDir
   - wget https://www.python.org/ftp/python/3.7.4/Python-3.7.4.tgz
-  - tar -xvf Python-3.7.4.tgz
+  - tar -xvf Python-3.7.4.tgz &>build_python3.log
   - cd $TRAVIS_BUILD_DIR/installDir/Python-3.7.4
   - cp $TRAVIS_BUILD_DIR/travis_build_python3.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
@@ -114,7 +114,7 @@ before_install:
   - cd $TRAVIS_BUILD_DIR/installDir
   - wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.bz2
   - bzip2 -d openmpi-4.0.1.tar.bz2
-  - tar -xvf openmpi-4.0.1.tar
+  - tar -xvf openmpi-4.0.1.tar &> build_mpi.log
   - cd openmpi-4.0.1/ 
   - cp $TRAVIS_BUILD_DIR/travis_build_openmpi.sh .
   - cp $TRAVIS_BUILD_DIR/log_monitor.sh .
